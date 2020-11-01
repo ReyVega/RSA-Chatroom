@@ -50,7 +50,6 @@ public class Client {
 								output.writeUTF(mensaje);
 							}
 						} catch (IOException e) {
-							e.printStackTrace();
 						}
 					}
 				}
@@ -67,7 +66,6 @@ public class Client {
 						} catch (SocketException e) {							
 							System.exit(0);
 						} catch (IOException e) {
-							e.printStackTrace();
 						}
 					}
 				}
@@ -77,6 +75,7 @@ public class Client {
 			this.recibirMensaje.start();
 
 		} catch (SocketException e) {
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

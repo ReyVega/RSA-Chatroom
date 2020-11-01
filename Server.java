@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 public class Server {
@@ -52,6 +53,7 @@ public class Server {
 				hilo.start();
 			}
 
+		} catch (SocketException e) {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
