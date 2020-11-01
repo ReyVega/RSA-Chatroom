@@ -12,6 +12,7 @@ public class ClientHandler implements Runnable {
 	private DataOutputStream output;
 	private String nombre;
 
+	// Constructor
 	public ClientHandler(Socket client, DataInputStream input, DataOutputStream output, String nombre) {
 		this.cliente = client;
 		this.input = input;
