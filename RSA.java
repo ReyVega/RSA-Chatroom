@@ -2,45 +2,90 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 
 public class RSA {
+	public static class Tuple3 {
+		private BigInteger x, y, gcd;
 
-	// Método para sacar el máximo común divisor
-	public static double mcd(int num1, int num2) {
-		int tmp;
-		while (true) {
-			tmp = num1 % num2;
-			if (tmp == 0) {
-				return num2;
-			}
-			num1 = num2;
-			num2 = tmp;
+		public Tuple3(BigInteger gcd, BigInteger x, BigInteger y) {
+			this.gcd = gcd;
+			this.x = x;
+			this.y = y;
+		}
+
+		public BigInteger getGCD() {
+			return this.gcd;
+		}
+		
+		public BigInteger getX() {
+			return this.x;
+		}
+
+		public BigInteger getY() {
+			return this.y;
+		}
+		
+		public void setGCD(BigInteger gcd) {
+			this.gcd = gcd;
+		}
+		
+		public void setX(BigInteger x) {
+			this.x = x;
+		}
+
+		public void setY(BigInteger y) {
+			this.y = y;
 		}
 	}
 
-	public static ArrayList<Integer> encriptar(String mensaje, int e, int n) {
-		ArrayList<Integer> resultado = new ArrayList<Integer>();
+	// Método para obtener el máximo común divisor (Algoritmo euclideano básico)
+	public static BigInteger gcd(BigInteger a, BigInteger b) {
+		if (a.compareTo(BigInteger.valueOf(0)) == 0) {
+			return b;
+		} else {
+			return gcd(b.mod(a), a);
+		}
+	}
+
+	// Método para obtener el máximo común divisor (Algoritmo euclideano extendido)
+	// ax + by = gcd(a, b)
+	public static Tuple3 gcdExtended(BigInteger a, BigInteger b) {
+		if (a.compareTo(BigInteger.valueOf(0)) == 0) {
+			return new Tuple3(b, BigInteger.valueOf(0), BigInteger.valueOf(1));
+		} else {
+			BigInteger x = BigInteger.valueOf(1),
+					   y = BigInteger.valueOf(1);
+			Tuple3 gcd = gcdExtended(b.mod(a), a);
+			
+			gcd.setX(y.subtract(b.divide(a)).multiply(x));
+			gcd.setY(x);
+			return gcd;
+		}
+	}
+
+	public static ArrayList<BigInteger> encriptar(String mensaje, BigInteger e, BigInteger n) {
+		ArrayList<BigInteger> resultado = new ArrayList<BigInteger>();
 
 		// (ch^e) mod n
 		for (Character ch : mensaje.toCharArray()) {
 			BigInteger base = BigInteger.valueOf((int) ch - 32);
-			BigInteger exponent = BigInteger.valueOf(e);
-			BigInteger mod = BigInteger.valueOf(n);
+			BigInteger exponent = e;
+			BigInteger mod = n;
 			base.modPow(exponent, mod);
 
-			resultado.add(base.intValue());
+			resultado.add(base);
 		}
 		return resultado;
 	}
 
-	public static String desencriptar(ArrayList<Integer> mensaje, int d, int n) {
+	public static String desencriptar(ArrayList<BigInteger> mensaje, BigInteger d, BigInteger n) {
 		String resultado = "";
 		// (ch^d) mod n
 		// Nota: ch ya está encriptado
-		for (Integer num : mensaje) {
-			BigInteger base = BigInteger.valueOf(num);
-			BigInteger exponent = BigInteger.valueOf(d);
-			BigInteger mod = BigInteger.valueOf(n);
+		for (BigInteger num : mensaje) {
+			BigInteger base = num;
+			BigInteger exponent = d;
+			BigInteger mod = n;
 			base.modPow(exponent, mod);
-			
+
 			char character = (char) (base.intValue() + 32);
 			resultado += character;
 		}
@@ -49,41 +94,37 @@ public class RSA {
 
 	public static void main(String[] args) {
 		// p y q son números primos
-		int p = 3, q = 7;
+		BigInteger p = BigInteger.valueOf(3), q = BigInteger.valueOf(7);
 
 		// Primera parte por hacer para obtener la llave pública
 		// n será el módulo a usar para encriptar y desencriptar mensajes
-		int n = p * q;
+		// n = p * q
+		BigInteger n = p.multiply(q);
 
 		// Calcular phi que es la segunda parte para obtener la llave pública
 		// "e" será la llave pública y sufrirá cambios al encontrar el coprimo
-		int phi = (p - 1) * (q - 1);
-		int e = 2;
+		// phi = (p - 1) * (q - 1)
+		BigInteger phi = p.subtract(BigInteger.valueOf(1)).multiply(q.subtract(BigInteger.valueOf(1)));
+		BigInteger e = BigInteger.valueOf(2);
 
 		// "e" tienes que ser menor y coprimo de phi
-		while (e < phi) {
-			if (mcd(e, phi) == 1) {
+		// e < phi
+		// -1 less, 0 equal, 1 greater
+		while (e.compareTo(phi) == -1) {
+			if (gcd(e, phi).compareTo(BigInteger.valueOf(1)) == 0) {
 				break;
 			} else {
-				e++;
+				e = e.add(BigInteger.valueOf(1));
 			}
 		}
 
 		// Obtención de la llave privada
-		int k = 0;
-		double dtmp = 0;
+		BigInteger d = gcdExtended(e, phi).getX().mod(phi);
 
-		do {
-			dtmp = (1.0 + (k * phi)) / e;
-			k++;
-		// Hasta que d sea un numero entero
-		} while (dtmp % 1 != 0);
-		int d = (int) dtmp;
-
-		String msg = "hola que tal uwu x z ari v";
-		
-		ArrayList<Integer> h = encriptar(msg, e, n);
+		String msg = "hola q tal?";
+	
+		ArrayList<BigInteger> h = encriptar(msg, e, n);
 		System.out.println(h);
-		System.out.println(desencriptar(h,d,n));
+		System.out.println(desencriptar(h, d, n));
 	}
 }
