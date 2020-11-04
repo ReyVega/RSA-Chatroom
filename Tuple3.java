@@ -20,16 +20,4 @@ public class Tuple3 {
 	public BigInteger getY() {
 		return this.y;
 	}
-
-	public void setGCD(BigInteger gcd) {
-		this.gcd = gcd;
-	}
-
-	public void setX(BigInteger x) {
-		this.x = x;
-	}
-
-	public void setY(BigInteger y) {
-		this.y = y;
-	}
 }

@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 
+
 public class Server {
 
 	// Variables globales
@@ -98,6 +99,7 @@ public class Server {
 		return tupla;
 	}
 
+	// Algoritmo euclidiano básico
 	public static BigInteger gcd(BigInteger a, BigInteger b) {
 		if (a.compareTo(BigInteger.valueOf(0)) == 0) {
 			return b;
@@ -106,21 +108,20 @@ public class Server {
 		}
 	}
 
+	// Método para obtener llave privada
 	public BigInteger generarLlavePrivada(BigInteger e, BigInteger phi) {
 		BigInteger d = gcdExtended(e, phi).getX().mod(phi);
 		return d;
 	}
 
+	// Algoritmo euclideano extendido
+	// ax + by = gcd(a, b)
 	public Tuple3 gcdExtended(BigInteger a, BigInteger b) {
 		if (a.compareTo(BigInteger.valueOf(0)) == 0) {
 			return new Tuple3(b, BigInteger.valueOf(0), BigInteger.valueOf(1));
 		} else {
-			BigInteger x = BigInteger.valueOf(1), y = BigInteger.valueOf(1);
 			Tuple3 gcd = gcdExtended(b.mod(a), a);
-
-			gcd.setX(y.subtract(b.divide(a)).multiply(x));
-			gcd.setY(x);
-			return gcd;
+			return new Tuple3(gcd.getGCD(),gcd.getY().subtract(b.divide(a).multiply(gcd.getX())), gcd.getX());
 		}
 	}
 

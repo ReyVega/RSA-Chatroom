@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class RSA {
 	public static class Tuple3 {
-		private BigInteger x, y, gcd;
+		private BigInteger gcd, x, y;
 
 		public Tuple3(BigInteger gcd, BigInteger x, BigInteger y) {
 			this.gcd = gcd;
@@ -14,25 +14,13 @@ public class RSA {
 		public BigInteger getGCD() {
 			return this.gcd;
 		}
-		
+
 		public BigInteger getX() {
 			return this.x;
 		}
 
 		public BigInteger getY() {
 			return this.y;
-		}
-		
-		public void setGCD(BigInteger gcd) {
-			this.gcd = gcd;
-		}
-		
-		public void setX(BigInteger x) {
-			this.x = x;
-		}
-
-		public void setY(BigInteger y) {
-			this.y = y;
 		}
 	}
 
@@ -51,13 +39,8 @@ public class RSA {
 		if (a.compareTo(BigInteger.valueOf(0)) == 0) {
 			return new Tuple3(b, BigInteger.valueOf(0), BigInteger.valueOf(1));
 		} else {
-			BigInteger x = BigInteger.valueOf(1),
-					   y = BigInteger.valueOf(1);
 			Tuple3 gcd = gcdExtended(b.mod(a), a);
-			
-			gcd.setX(y.subtract(b.divide(a)).multiply(x));
-			gcd.setY(x);
-			return gcd;
+			return new Tuple3(gcd.getGCD(), gcd.getY().subtract(b.divide(a).multiply(gcd.getX())), gcd.getX());
 		}
 	}
 
@@ -66,12 +49,12 @@ public class RSA {
 
 		// (ch^e) mod n
 		for (Character ch : mensaje.toCharArray()) {
-			BigInteger base = BigInteger.valueOf((int) ch - 32);
+			BigInteger base = BigInteger.valueOf((int) ch);
 			BigInteger exponent = e;
 			BigInteger mod = n;
-			base.modPow(exponent, mod);
+			BigInteger c = base.modPow(exponent, mod);
 
-			resultado.add(base);
+			resultado.add(c);
 		}
 		return resultado;
 	}
@@ -84,9 +67,9 @@ public class RSA {
 			BigInteger base = num;
 			BigInteger exponent = d;
 			BigInteger mod = n;
-			base.modPow(exponent, mod);
+			BigInteger c = base.modPow(exponent, mod);
 
-			char character = (char) (base.intValue() + 32);
+			char character = (char) (c.intValue());
 			resultado += character;
 		}
 		return resultado;
@@ -94,7 +77,7 @@ public class RSA {
 
 	public static void main(String[] args) {
 		// p y q son números primos
-		BigInteger p = BigInteger.valueOf(3), q = BigInteger.valueOf(7);
+		BigInteger p = BigInteger.valueOf(1993), q = BigInteger.valueOf(1997);
 
 		// Primera parte por hacer para obtener la llave pública
 		// n será el módulo a usar para encriptar y desencriptar mensajes
@@ -120,11 +103,13 @@ public class RSA {
 
 		// Obtención de la llave privada
 		BigInteger d = gcdExtended(e, phi).getX().mod(phi);
-
-		String msg = "a ver hola";
+		String msg = "hola";
 
 		ArrayList<BigInteger> h = encriptar(msg, e, n);
 		System.out.println(h);
-//		System.out.println(desencriptar(h, d, n));
+		System.out.println(d);
+		System.out.println(n);
+		System.out.println(e);
+		System.out.println(desencriptar(h, d, n));
 	}
 }

@@ -117,12 +117,12 @@ public class ClientHandler implements Runnable {
 
 		// (ch^e) mod n
 		for (Character ch : mensaje.toCharArray()) {
-			BigInteger base = BigInteger.valueOf((int) ch - 32);
+			BigInteger base = BigInteger.valueOf((int)ch);
 			BigInteger exponent = e;
 			BigInteger mod = n;
-			base.modPow(exponent, mod);
+			BigInteger c = base.modPow(exponent, mod);
 
-			resultado.add(base);
+			resultado.add(c);
 		}
 		return resultado;
 	}
@@ -135,9 +135,9 @@ public class ClientHandler implements Runnable {
 			BigInteger base = num;
 			BigInteger exponent = d;
 			BigInteger mod = n;
-			base.modPow(exponent, mod);
+			BigInteger c = base.modPow(exponent, mod);
 
-			char character = (char) (base.intValue() + 32);
+			char character = (char) (c.intValue());
 			resultado += character;
 		}
 		return resultado;
