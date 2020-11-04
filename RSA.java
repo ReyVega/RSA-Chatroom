@@ -121,10 +121,10 @@ public class RSA {
 		// Obtención de la llave privada
 		BigInteger d = gcdExtended(e, phi).getX().mod(phi);
 
-		String msg = "hola q tal?";
-	
+		String msg = "a ver hola";
+
 		ArrayList<BigInteger> h = encriptar(msg, e, n);
 		System.out.println(h);
-		System.out.println(desencriptar(h, d, n));
+//		System.out.println(desencriptar(h, d, n));
 	}
 }
