@@ -63,13 +63,13 @@ public class ClientHandler implements Runnable {
 							ArrayList<BigInteger> msgEncriptado = encriptar(mensajePrivado, ch.getLlavePublica(),
 									ch.getModulo());
 							System.out.println("> " + this.nombre + ": " + msgEncriptado);
-							
+
 							String msgDescifrado = ch.desencriptar(msgEncriptado, ch.getLlavePrivada(), ch.getModulo());
 							ch.output.writeUTF(this.nombre + ": " + msgDescifrado);
 							System.out.println("> " + this.nombre + ": " + msgDescifrado);
 						}
 					}
-				// Mensajes públicos
+					// Mensajes públicos
 				} else {
 					// Mandar mensaje del cliente a todos menos a él mismo
 					for (ClientHandler ch : Server.clientes) {
@@ -112,22 +112,38 @@ public class ClientHandler implements Runnable {
 		}
 	}
 
-	public ArrayList<BigInteger> encriptar(String mensaje, BigInteger e, BigInteger n) {
+	// Exponenciación rápida
+	public static BigInteger fastExponentiation(BigInteger a, BigInteger b, BigInteger m) {
+		BigInteger result = BigInteger.valueOf(1);
+		// while(b > 0)
+		while (b.compareTo(BigInteger.valueOf(0)) == 1) {
+			// if(b % 2 == 0), checamos si el dígito binario es 1
+			if (b.mod(BigInteger.valueOf(2)).compareTo(BigInteger.valueOf(1)) == 0) {
+				result = result.multiply(a).mod(m);
+			}
+			a = a.multiply(a).mod(m);
+			// Dividimos para sacar los dígitos del número binario
+			b = b.divide(BigInteger.valueOf(2));
+		}
+		return result;
+	}
+
+	public static ArrayList<BigInteger> encriptar(String mensaje, BigInteger e, BigInteger n) {
 		ArrayList<BigInteger> resultado = new ArrayList<BigInteger>();
 
 		// (ch^e) mod n
 		for (Character ch : mensaje.toCharArray()) {
-			BigInteger base = BigInteger.valueOf((int)ch);
+			BigInteger base = BigInteger.valueOf((int) ch);
 			BigInteger exponent = e;
 			BigInteger mod = n;
-			BigInteger c = base.modPow(exponent, mod);
+			BigInteger c = fastExponentiation(base, exponent, mod);
 
 			resultado.add(c);
 		}
 		return resultado;
 	}
 
-	public String desencriptar(ArrayList<BigInteger> mensaje, BigInteger d, BigInteger n) {
+	public static String desencriptar(ArrayList<BigInteger> mensaje, BigInteger d, BigInteger n) {
 		String resultado = "";
 		// (ch^d) mod n
 		// Nota: ch ya está encriptado
@@ -135,7 +151,7 @@ public class ClientHandler implements Runnable {
 			BigInteger base = num;
 			BigInteger exponent = d;
 			BigInteger mod = n;
-			BigInteger c = base.modPow(exponent, mod);
+			BigInteger c = fastExponentiation(base, exponent, mod);
 
 			char character = (char) (c.intValue());
 			resultado += character;
