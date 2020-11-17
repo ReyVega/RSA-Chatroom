@@ -62,11 +62,11 @@ public class ClientHandler implements Runnable {
 						if (ch.nombre.equals(persona)) {
 							ArrayList<BigInteger> msgEncriptado = encriptar(mensajePrivado, ch.getLlavePublica(),
 									ch.getModulo());
-							System.out.println("> " + this.nombre + ": " + msgEncriptado);
+							System.out.println("> " + this.nombre + ": " + msgEncriptado + " (cifrado para " + ch.getNombre() + ")");
 
 							String msgDescifrado = ch.desencriptar(msgEncriptado, ch.getLlavePrivada(), ch.getModulo());
 							ch.output.writeUTF(this.nombre + ": " + msgDescifrado);
-							System.out.println("> " + this.nombre + ": " + msgDescifrado);
+							System.out.println("> " + this.nombre + ": " + msgDescifrado + " (descifrado por " + ch.getNombre() + ")");
 						}
 					}
 					// Mensajes públicos
@@ -77,12 +77,12 @@ public class ClientHandler implements Runnable {
 							// Encriptar mensaje dependiendo del cliente al que se le envíe
 							ArrayList<BigInteger> msgEncriptado = encriptar(recibido, ch.getLlavePublica(),
 									ch.getModulo());
-							System.out.println("> " + this.nombre + ": " + msgEncriptado);
+							System.out.println("> " + this.nombre + ": " + msgEncriptado + " (cifrado para " + ch.getNombre() + ")");
 
 							// Descifrar mensaje desde la consola del propietario de la llave privada
 							String msgDescifrado = ch.desencriptar(msgEncriptado, ch.getLlavePrivada(), ch.getModulo());
 							ch.output.writeUTF(this.nombre + ": " + msgDescifrado);
-							System.out.println("> " + this.nombre + ": " + msgDescifrado);
+							System.out.println("> " + this.nombre + ": " + msgDescifrado + " (descifrado por " + ch.getNombre() + ")");
 						}
 					}
 				}
@@ -169,5 +169,9 @@ public class ClientHandler implements Runnable {
 
 	public BigInteger getLlavePrivada() {
 		return this.d;
+	}
+	
+	public String getNombre() {
+		return this.nombre;
 	}
 }
