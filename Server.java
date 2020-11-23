@@ -8,7 +8,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 
-
 public class Server {
 
 	// Variables globales
@@ -46,7 +45,7 @@ public class Server {
 				BigInteger n = tupla.get(0);
 				BigInteger e = tupla.get(1);
 				BigInteger d = generarLlavePrivada(tupla.get(1), tupla.get(2));
-		
+
 				ClientHandler manejador = new ClientHandler(this.socket, this.input, this.output, nombre, n, e, d);
 
 				// Crear hilo para el cliente
@@ -67,7 +66,8 @@ public class Server {
 
 	public ArrayList<BigInteger> generarLlavePublica() {
 		// p y q son números primos
-		BigInteger p = new BigInteger(PrimeNumbers.primeNumbers.get(0)), q = new BigInteger(PrimeNumbers.primeNumbers.get(1));
+		BigInteger p = new BigInteger(PrimeNumbers.primeNumbers.get(0)),
+				q = new BigInteger(PrimeNumbers.primeNumbers.get(1));
 		PrimeNumbers.primeNumbers.remove(0);
 		PrimeNumbers.primeNumbers.remove(0);
 
@@ -82,8 +82,8 @@ public class Server {
 		BigInteger phi = p.subtract(BigInteger.valueOf(1)).multiply(q.subtract(BigInteger.valueOf(1)));
 		BigInteger e = BigInteger.valueOf(2);
 
-		// "e" tienes que ser menor y coprimo de phi
-		// e < phi
+		// "e" tienes que ser menor y coprimo de phi y también mayor a 1
+		// 1 < e < phi
 		// -1 less, 0 equal, 1 greater
 		while (e.compareTo(phi) == -1) {
 			if (gcd(e, phi).compareTo(BigInteger.valueOf(1)) == 0) {
@@ -99,7 +99,7 @@ public class Server {
 		return tupla;
 	}
 
-	// Algoritmo euclidiano básico
+	// Método para obtener el máximo común divisor (Algoritmo euclideano básico)
 	public static BigInteger gcd(BigInteger a, BigInteger b) {
 		if (a.compareTo(BigInteger.valueOf(0)) == 0) {
 			return b;
@@ -114,14 +114,20 @@ public class Server {
 		return d;
 	}
 
-	// Algoritmo euclideano extendido
+	// Método para obtener el máximo común divisor (Algoritmo euclideano extendido)
+	// ed = 1 mod(phi)
+	// d = e^-1 mod(phi)
 	// ax + by = gcd(a, b)
+	// e*d + phi*y = 1
+	// (e*d + phi*y = 1)*mod(phi) phi*y = 0, ya que es un múlitplo de mod(phi)
+	// ed = 1 mod(phi)
+	// d = e^-1 mod(phi)
 	public Tuple3 gcdExtended(BigInteger a, BigInteger b) {
 		if (a.compareTo(BigInteger.valueOf(0)) == 0) {
 			return new Tuple3(b, BigInteger.valueOf(0), BigInteger.valueOf(1));
 		} else {
 			Tuple3 gcd = gcdExtended(b.mod(a), a);
-			return new Tuple3(gcd.getGCD(),gcd.getY().subtract(b.divide(a).multiply(gcd.getX())), gcd.getX());
+			return new Tuple3(gcd.getGCD(), gcd.getY().subtract(b.divide(a).multiply(gcd.getX())), gcd.getX());
 		}
 	}
 
